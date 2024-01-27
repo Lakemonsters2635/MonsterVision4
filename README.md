@@ -76,8 +76,12 @@ Run MonsterVision4 via:
 python MonsterVision4.py
 ```
 ## Development Environment
-### Install ***GitHub Pull Requests and Issues*** Externsion
-To enable GitHub integration, you need to install the above-named extension.  After installation, you'll need to log into your GitHub account.  **TODO** Instructions for doing this.
+### Install ***GitHub Pull Requests and Issues*** Extension
+To enable GitHub integration, you need to install the above-named extension.  After installation, you'll need to log into your GitHub account.
+### How to login to your github account
+- Open a Terminal
+- run `git config --global user.email "you@example.com"`
+- Then run `git config --global user.name "Your Name"`
 ### Debugging Using VS Code
 - After launching VS Code, select **File** | **Open Folder...** and select the `MonsterVision4` directory.
 - Select **View** | **Command Palette...**.
