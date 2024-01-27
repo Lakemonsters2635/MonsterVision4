@@ -5,8 +5,8 @@ It is recommended (but not required) that you use an SSD rather than an SD card 
 
 Once you've gotten your Pi up and running, follow this procedure:
 
-## Start with installing Visual Studio Code which should also isntall CMake.
-You can skip this step if you just want to install CMake on your own but I havn't tested if that works.
+## Start with installing Visual Studio Code which should also install CMake.
+You can skip this step if you just want to install CMake on your own but I haven't tested if that works.
 Visual Studio Code is the preferred development environment for consistency with our general FRC code development.  It is officially distributed via the Raspberry Pi OS APT repository in both 32- and 64-bit versions:  Install via:
 ```shell
 sudo apt update
