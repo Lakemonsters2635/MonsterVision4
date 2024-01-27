@@ -52,14 +52,14 @@ def runOAK1(devInfo, cam):
 
         oak.runPipeline(processDetections, objectsCallback, displayResults, processExtra1, cam, contours) # Run the camera
     except:
-        print("runOAK1 died.  Killing MonsterVision3")
+        print("runOAK1 died.  Killing MonsterVision4")
         quit()                                          # If any exception occurs, quit the entire program.
                                                         # The WPI infrastructure will restart us
     return
 
 def runOAKD(devInfo, cam):
     try:
-        OAK = importlib.import_module("MV3")            # Allows substitution of other pilelines!
+        OAK = importlib.import_module("MV4")            # Allows substitution of other pilelines!
         aprilTags = AprilTags4.AprilTags("tag16h5")
         oak = OAK.OAK(devInfo, frc.LaserDotProjectorCurrent)
         nnConfig = oak.read_nn_config()
@@ -68,8 +68,9 @@ def runOAKD(devInfo, cam):
         oak.buildPipeline(spatialDetectionNetwork)
 
         oak.runPipeline(processDetections, objectsCallback, displayResults, processExtraD, cam, aprilTags)
-    except:
-        print("runOAKD died.  Killing MonsterVision3")
+    except Exception as err:
+        print("runOAKD died.  Killing MonsterVision4")
+        print(err)
         quit()                                          # If any exception occurs, quit the entire program.
                                                         # The WPI infrastructure will restart us
     return
@@ -100,8 +101,9 @@ OAK_1_MXID = None
 
 infos = dai.DeviceBootloader.getAllAvailableDevices()
 # OAK_D_MXID = "14442C105129C6D200"     # Original OAK-D at Michael's house
-OAK_1_MXID = "14442C10E1474FD000"
-OAK_D_MXID = '1944301001564D1300'       # OAK-D Pro
+# OAK_1_MXID = "14442C10E1474FD000"
+# OAK_D_MXID = '1944301001564D1300'       # OAK-D Pro
+OAK_D_MXID = "14442C105129C6D200"
 
 def checkCam(infos, mxid):
     for i in infos:
@@ -135,7 +137,7 @@ if OAK_D_DEVINFO is not None:
 
 frc.runDisplay()
 
-print("Main thread died.  Killing MonsterVision3")
+print("Main thread died.  Killing MonsterVision4")
 quit()                              # Should never get here.  If we do, kill everything
                                     # Let the WPI infrastructure restart us.
 

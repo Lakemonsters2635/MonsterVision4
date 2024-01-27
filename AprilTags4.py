@@ -3,7 +3,7 @@ import apriltag
 import cv2
 import math
 import numpy as np
-import RANSAC
+import RANSAC4
 import logging
 import depthai as dai
 import PLANE_FIT4
@@ -97,7 +97,7 @@ class AprilTags:
                 pass
 
         PLANE_FIT4.FIT_PLANE(pointCloud, pointCount)
-        plane = RANSAC.RANSAC(pointCloud[0:index], index)
+        plane = RANSAC4.RANSAC(pointCloud[0:index], index)
 
         if plane is None:
             return (None, None)
@@ -171,7 +171,7 @@ class AprilTags:
 
     # def getTrapAngles()
         
-    def __init__(self, tagFamilies, cameraIntrinsics, rgbHFOV = None):
+    def __init__(self, tagFamilies, cameraIntrinsics=None, rgbHFOV = None): # Never use the cameraIntrinsics variable and it was throwing an error so I default it to None
         options = apriltag.DetectorOptions(families="tag16h5")
         self.detector = apriltag.Detector(options)
         

@@ -2,5 +2,5 @@
 ### TYPE: builtin
 echo "Waiting 5 seconds..."
 sleep 5
-cd /home/pi/MonsterVision3
-exec ./MonsterVision3.py
+cd /home/pi/MonsterVision4
+exec ./MonsterVision4.py

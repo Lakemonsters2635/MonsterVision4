@@ -302,7 +302,7 @@ class OAK:
         self.camRgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
         self.camRgb.setColorOrder(dai.ColorCameraProperties.ColorOrder.BGR)                 # **NEW**
         self.camRgb.setFps(self.fps)
-        if self.downscaleColor: self.camRgb.setIspScale(2, 3)                               # **NOT IN MV3**
+        if self.downscaleColor: self.camRgb.setIspScale(2, 3)                               # **NOT IN MV4**
         # For now, RGB needs fixed focus to properly align with depth.
         # This value was used during calibration
         try:
