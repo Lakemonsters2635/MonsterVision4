@@ -136,10 +136,12 @@ class FRC:
     
     def writeObjectsToNetworkTable(self, jsonObjects, cam):
         # Protect NT access with a lock.  Just in case NT implementation is not thread-safe
-        self.lockNT.acquire()
+        self.lockNT.acquire() # Acquire the NT's thread and block other attempts to lock-on/acquire
+        # Put onto table with the ID of ex."ObjectTracker-Chassis" and overwrites the previous frame data
+        # Looks like this on the table: "[{'objectLabel': 'cone', 'x': 2, 'y': -3, 'z': 27, 'confidence': 0.87}]"
         self.sd.putString("ObjectTracker-" + cam, jsonObjects)
-        self.ntinst.flush()
-        self.lockNT.release()
+        self.ntinst.flush() # Puts all values onto table immediately
+        self.lockNT.release() # Release the thread to allow other locks or whatever you want
 
     def displayResults(self, fullFrame, depthFrameColor, detectionFrame, cam):
         if self.hasDisplay:

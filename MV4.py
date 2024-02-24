@@ -364,11 +364,12 @@ class OAK:
                     print("Projector Fail")
 
             while True:
-                self.inPreview = previewQueue.get()
-                self.inDet = detectionNNQueue.get()
-                self.depth = depthQueue.get()
-                self.isp = ispQueue.get()
-
+                self.inPreview = previewQueue.get() # Preview queue
+                self.inDet = detectionNNQueue.get() # Detections JSON queue
+                self.depth = depthQueue.get() # Depth of all pixels queue
+                self.isp = ispQueue.get() # The ISP? queue
+                
+                # Frame counting
                 counter += 1
                 current_time = time.monotonic()
                 if (current_time - startTime) > 1:
@@ -376,27 +377,30 @@ class OAK:
                     counter = 0
                     startTime = current_time
 
-                self.frame = self.inPreview.getCvFrame()
-                self.depthFrame = self.depth.getFrame()
-                self.ispFrame = self.isp.getCvFrame()
+                self.frame = self.inPreview.getCvFrame() # Get the openCV version of the frame for display purposes
+                self.depthFrame = self.depth.getFrame() # Get all depth info as a not a point cloud ?image? ?openCV?
+                self.ispFrame = self.isp.getCvFrame() # Get ISP? frame as openCV for display
 
+                # Convert depth frame into fancy colors for your viewing pleasure
                 self.depthFrameColor = cv2.normalize(self.depthFrame, None, 255, 0, cv2.NORM_INF, cv2.CV_8UC1)
                 self.depthFrameColor = cv2.equalizeHist(self.depthFrameColor)
                 self.depthFrameColor = cv2.applyColorMap(self.depthFrameColor, cv2.COLORMAP_RAINBOW)
 
-                detections = self.inDet.detections
+                detections = self.inDet.detections # Get the detections part as a JSON (I think)
                 if len(detections) != 0:
-                    objects = processDetections(self, detections)
+                    objects = processDetections(self, detections) # Returns JSON object of detected objects
                     if objects is None:
-                        objects = []
+                        objects = [] # Objects will look like this: [{'objectLabel': 'cone', 'x': 2, 'y': -3, 'z': 27, 'confidence': 0.87}]
                 else:
                     objects = []
-
+                
+                # Runs the callback like function
                 if processImages is not None:
                     additionalObjects = processImages(self.ispFrame, self.depthFrame, self.depthFrameColor, self.frame, imagesParam)
                     if additionalObjects is not None:
                         objects.extend(additionalObjects)
-
+                
+                # PUTS TO NETWORK TABLE
                 if objectsCallback is not None:
                     objectsCallback(objects, cam)
 

@@ -96,7 +96,7 @@ class AprilTags:
                 # should come back and figure out what is going on.
                 pass
 
-        PLANE_FIT4.FIT_PLANE(pointCloud, pointCount)
+        # PLANE_FIT4.FIT_PLANE(pointCloud, pointCount)
         plane = RANSAC4.RANSAC(pointCloud[0:index], index)
 
         if plane is None:
@@ -172,7 +172,7 @@ class AprilTags:
     # def getTrapAngles()
         
     def __init__(self, tagFamilies, cameraIntrinsics=None, rgbHFOV = None): # Never use the cameraIntrinsics variable and it was throwing an error so I default it to None
-        options = apriltag.DetectorOptions(families="tag16h5")
+        options = apriltag.DetectorOptions(families="tag36h11")
         self.detector = apriltag.Detector(options)
         
         # with 

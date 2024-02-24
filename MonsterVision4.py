@@ -57,12 +57,16 @@ def runOAK1(devInfo, cam):
                                                         # The WPI infrastructure will restart us
     return
 
-def runOAKD(devInfo, cam):
+def runOAKD(devInfo, cam, laser=True):
     try:
         OAK = importlib.import_module("MV4")            # Allows substitution of other pilelines!
-        aprilTags = AprilTags4.AprilTags("tag16h5")
-        oak = OAK.OAK(devInfo, frc.LaserDotProjectorCurrent)
+        aprilTags = AprilTags4.AprilTags("tag36h11")
+        if laser:  
+            oak = OAK.OAK(devInfo, frc.LaserDotProjectorCurrent)
+        else:
+            oak = OAK.OAK(devInfo, None)
         nnConfig = oak.read_nn_config()
+    
 
         spatialDetectionNetwork = oak.setupSDN(nnConfig)
         oak.buildPipeline(spatialDetectionNetwork)
@@ -81,16 +85,16 @@ PREVIEW_HEIGHT = 200
 frc = FRC4.FRC(PREVIEW_WIDTH, PREVIEW_HEIGHT)
 
 OAK_D_MXID = None
-OAK_1_MXID = None
+OAK_DP_MXID = None
 
 # devices = DAI.DAI.getDevices()
 
 # for c in devices:
 #     if c["cameras"] == 1:
-#         if OAK_1_MXID is None:
-#             OAK_1_MXID = c["mxid"]
+#         if OAK_DP_MXID is None:
+#             OAK_DP_MXID = c["mxid"]
 #         else:
-#             print(f"Found multiple OAK-1 devices.  Using {OAK_1_MXID}")
+#             print(f"Found multiple OAK-1 devices.  Using {OAK_DP_MXID}")
 #     elif c["cameras"] == 3:
 #         if OAK_D_MXID is None:
 #             OAK_D_MXID = c["mxid"]
@@ -100,10 +104,9 @@ OAK_1_MXID = None
 #         print(f'Found device {c["mxid"]} having {c["cameras"]}.  This is unusual.')
 
 infos = dai.DeviceBootloader.getAllAvailableDevices()
-# OAK_D_MXID = "14442C105129C6D200"     # Original OAK-D at Michael's house
-# OAK_1_MXID = "14442C10E1474FD000"
-# OAK_D_MXID = '1944301001564D1300'       # OAK-D Pro
 OAK_D_MXID = "14442C105129C6D200"
+OAK_DP_MXID = '1944301001564D1300'       # OAK-D Pro
+# OAK_1_MXID = "14442C10E1474FD000"
 
 def checkCam(infos, mxid):
     for i in infos:
@@ -111,26 +114,26 @@ def checkCam(infos, mxid):
     return None
 
 OAK_D_DEVINFO = checkCam(infos, OAK_D_MXID)
-OAK_1_DEVINFO = checkCam(infos, OAK_1_MXID)
+OAK_DP_DEVINFO = checkCam(infos, OAK_DP_MXID)
 
-if OAK_D_DEVINFO is None and OAK_1_DEVINFO is None:
+if OAK_D_DEVINFO is None and OAK_DP_DEVINFO is None:
     print("No cameras found")
     exit()
 
 print("Using cameras:")
 if OAK_D_DEVINFO is not None: print(f"{OAK_D_MXID} OAK-D")
-if OAK_1_DEVINFO is not None: print(f"{OAK_1_MXID} OAK-1")
+if OAK_DP_DEVINFO is not None: print(f"{OAK_DP_MXID} OAK-DP")
 
-thread1 = None
 threadD = None
-
-if OAK_1_DEVINFO is not None:
-    thread1 = threading.Thread(target=runOAK1, args=(OAK_1_DEVINFO, "Gripper", ))
-    thread1.start()
+threadDP = None
 
 if OAK_D_DEVINFO is not None:
-    threadD = threading.Thread(target=runOAKD, args=(OAK_D_DEVINFO, "Chassis", ))
+    threadD = threading.Thread(target=runOAKD, args=(OAK_D_DEVINFO, "NoteCam", False))
     threadD.start()
+
+if OAK_DP_DEVINFO is not None:
+    threadDP = threading.Thread(target=runOAKD, args=(OAK_DP_DEVINFO, "AprilTagPro"))
+    threadDP.start()
 
 # Now call the display queue worker loop (must be run from main thread)
 # This should never return until the user types 'q' (if windows are being used)
