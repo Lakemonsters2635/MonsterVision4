@@ -339,6 +339,7 @@ class OAK:
         with dai.Device(self.pipeline, self.devInfo) as device:
         # For now, RGB needs fixed focus to properly align with depth.
         # This value was used during calibration
+            # Try to calibrate the camera
             try:
                 self.calibData = device.readCalibration2()
                 print(self.calibData)
@@ -346,7 +347,7 @@ class OAK:
                 if lensPosition:
                     self.camRgb.initialControl.setManualFocus(lensPosition)
             except:
-                print("help!")
+                print("Camera calibration failed!")
                 pass
 
             # Output queues will be used to get the rgb frames and nn data from the outputs defined above
