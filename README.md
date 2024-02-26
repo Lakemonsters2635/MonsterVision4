@@ -162,7 +162,7 @@ In `/boot/frc.json`, set the property `"ntmode": "server"` such that a network t
     "switched cameras": [],
     "team": 2635,
     "XXXhasDisplay": 1,
-    "LaserDotProjectorCurrent": 512
+    "LaserDotProjectorCurrent": 765
 }
 ```
 

@@ -36,9 +36,6 @@ def objectsCallback(objects, cam):
 def displayResults(fullFrame, depthFrameColor, detectionFrame, cam):
     return frc.displayResults(fullFrame, depthFrameColor, detectionFrame, cam)
 
-
-
-
 def runOAK1(devInfo, cam):
     try:
         OAK = importlib.import_module("Gripper4")            # Allows substitution of other pilelines!

@@ -23,12 +23,13 @@ class MTD:
 
     def displayLoop(self):
         while True:
-            (window, image) = self.Q.get(True)
+            (window, image) = self.Q.get(True) # Get the image from the queue window named  "DS Image"
+            # If it's the right window name and cscore is available then put it onto the camera server website
             if window == "DS Image":
                 if cscoreAvailable:
                     self.csoutput.putFrame(image)
                 continue
-            cv2.imshow(window, image)
+            cv2.imshow(window, image) # Show the image that you output to the server to the screen
             self.Q.task_done()
             wk = cv2.waitKey(1)
             self.allDone = self.allDone or wk == 113

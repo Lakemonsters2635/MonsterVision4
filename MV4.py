@@ -407,6 +407,7 @@ class OAK:
 
                 self.displayDebug(device)
 
+                # Create a bunch of pop-up display windows
                 if displayResults is not None:
                     if displayResults(self.ispFrame, self.depthFrameColor, self.frame, cam) == False:
                         return
