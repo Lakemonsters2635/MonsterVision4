@@ -54,7 +54,7 @@ class OAK:
 
         self.bbfraction = 0.2
 
-        self.CAMERA_FPS = 50
+        self.CAMERA_FPS = 30
         self.DESIRED_FPS = 10		# seem to actually get 1/2 this.  Don't know why.....
         self.PREVIEW_WIDTH = 200
         self.PREVIEW_HEIGHT = 200
