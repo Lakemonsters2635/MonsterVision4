@@ -2,6 +2,7 @@
 This document covers installing MV4 on a Raspberry Pi development machine. See [here](#How-to-Install-MonsterVision4-for-FRC-Competition) for deployment instructions.
 
 It is recommended (but not required) that you use an SSD rather than an SD card on your Pi.  If you do, you may need to enable your Pi to boot from the SSD.  This only needs to be done once.  [Follow these instructions.](https://peyanski.com/how-to-boot-raspberry-pi-4-from-ssd/#:~:text=To%20boot%20Raspberry%20Pi%204%20from%20SSD%20you,USB%20to%20boot%20raspberry%20Pi%204%20from%20SSD.)
+At this time it is important to note that SSDs are not competition legal for FRC.
 
 Once you've gotten your Pi up and running, follow this procedure:
 
@@ -52,7 +53,8 @@ Finally, you'll need to copy 2 files into the `/boot` directory.  You'll need ro
     "ntmode": "client",
     "switched cameras": [],
     "team": 2635,
-    "hasDisplay": 1
+    "hasDisplay": 1,
+    "LaserDotProjectorCurrent": 765.0
 }
 ```
 |Entry|Values||
@@ -62,6 +64,7 @@ Finally, you'll need to copy 2 files into the `/boot` directory.  You'll need ro
 |`team`|Team number||
 |`hasDisplay`|**0**|Host is headless|
 ||**1**|Host has attached display - depth and annotation windows will be displayed|
+|`LaserDotProjectorCurrent`|Desired Current|This is for an OAK-D Pro and if you don't have one you can remove it. 765 mA is the most efficent value but you can put in any value|
 
 Copy this file:
 ```shell
@@ -69,7 +72,7 @@ sudo cp frc.json /boot
 ```
 The second needed in /boot is `nn.json`.  This file determines which detection network is to be run.  Copy one of the `.json` files from `./models` directory.  For example, to use the 2022 Cargo YOLOv6 Tiny network:
 ```shell
-sudo cp models/nn-2022cargoyolo6t.json /boot/nn.json
+sudo cp models/2024.json /boot/nn.json
 ```
 Run MonsterVision4 via:
 ```shell
@@ -133,7 +136,7 @@ Click on `Vision Settings` in the left pane.  Make sure the `Client` switch is t
 
 Return now to your SSH session so we can configure the correct detection network. Copy one of the `.json` files from `./models` directory.  For example, to use the 2022 Cargo YOLOv6 Tiny network:
 ```shell
-sudo cp models/nn-2022cargoyolo6t.json /boot/nn.json
+sudo cp models/2024.json /boot/nn.json
 ```
 We also need to replace the stock WPILibPi camera module with MonsterVision4 and make MonsterVision4 executable
 ```shell

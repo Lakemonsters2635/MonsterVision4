@@ -84,7 +84,7 @@ frc = FRC4.FRC(PREVIEW_WIDTH, PREVIEW_HEIGHT)
 OAK_D_MXID = None
 OAK_DP_MXID = None
 
-# devices = DAI.DAI.getDevices()
+# devices = DAI4.DAI4.getDevices()
 
 # for c in devices:
 #     if c["cameras"] == 1:
