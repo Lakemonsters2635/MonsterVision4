@@ -2,4 +2,4 @@ __pycache__
 point_clouds
 TestPlot.txt
 .tmp.txt
-settings.json
+.vscode
