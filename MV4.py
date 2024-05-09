@@ -54,7 +54,7 @@ class OAK:
 
         self.bbfraction = 0.2
 
-        self.CAMERA_FPS = 30
+        self.CAMERA_FPS = 50
         self.DESIRED_FPS = 10		# seem to actually get 1/2 this.  Don't know why.....
         self.PREVIEW_WIDTH = 200
         self.PREVIEW_HEIGHT = 200
@@ -422,6 +422,7 @@ class OAK:
         # re-initializes objects to zero/empty before each frame is read
         objects = []
         s_detections = sorted(detections, key=lambda det: det.label * 100000 + det.spatialCoordinates.z)
+        print(s_detections)
 
         for detection in s_detections:
             roi = detection.boundingBoxMapping.roi
@@ -486,4 +487,3 @@ class OAK:
                     (255, 255, 255))
 
         return objects
-                

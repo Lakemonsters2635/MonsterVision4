@@ -4,14 +4,14 @@ import time
 import json
 import numpy as np
 from numpy.linalg import lstsq
-import pypotree as tree # pip install pypotree
+#import pypotree as tree # pip install pypotree
 import os
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import cv2
-import statsmodels.api as sm 
-from statsmodels.formula.api import ols 
-import seaborn as sns
-import pandas as pd
+#import statsmodels.api as sm 
+#from statsmodels.formula.api import ols 
+#import seaborn as sns
+#import pandas as pd
 
 # @profile
 def FIT_PLANE(pointCloud, pointCount, plotCloud=True):
@@ -22,9 +22,9 @@ def FIT_PLANE(pointCloud, pointCount, plotCloud=True):
     points = np.vstack(points)
     print(points.shape)
     # Generate point cloud to be viewed
-    cloud_path = tree.generate_cloud_for_display(points)
+    #cloud_path = tree.generate_cloud_for_display(points)
     plotCloud = False
-    tree.display_cloud(cloud_path)
+    #tree.display_cloud(cloud_path)
     if plotCloud:
         fig = plt.figure()
         ax = fig.add_subplot(projection='3d')

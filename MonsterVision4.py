@@ -101,7 +101,7 @@ OAK_DP_MXID = None
 #         print(f'Found device {c["mxid"]} having {c["cameras"]}.  This is unusual.')
 
 infos = dai.DeviceBootloader.getAllAvailableDevices()
-OAK_D_MXID = "14442C105129C6D200"
+# OAK_D_MXID = "14442C105129C6D200"
 OAK_DP_MXID = '1944301001564D1300'       # OAK-D Pro
 # OAK_1_MXID = "14442C10E1474FD000"
 

@@ -4,8 +4,10 @@ import queue
 cscoreAvailable = True
 try:
     from cscore import CameraServer
+    #print("Imported CSCore :)")
 except ImportError:
     cscoreAvailable = False
+    #print("CSCore not installed sadge")
 
 class MTD:
     def __init__(self, previewWidth, previewHeight):
@@ -19,17 +21,17 @@ class MTD:
 
 
     def enqueueImage(self, window : str, image):
-        self.Q.put((window, image))
+        resized = cv2.resize(image, (200, 200), interpolation=cv2.INTER_LINEAR)
+        self.Q.put((window, resized))
 
     def displayLoop(self):
         while True:
-            (window, image) = self.Q.get(True) # Get the image from the queue window named  "DS Image"
-            # If it's the right window name and cscore is available then put it onto the camera server website
+            (window, image) = self.Q.get(True)
             if window == "DS Image":
                 if cscoreAvailable:
                     self.csoutput.putFrame(image)
                 continue
-            cv2.imshow(window, image) # Show the image that you output to the server to the screen
+            cv2.imshow(window, image)
             self.Q.task_done()
             wk = cv2.waitKey(1)
             self.allDone = self.allDone or wk == 113
