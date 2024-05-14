@@ -178,7 +178,7 @@ class AprilTags:
         # with 
 
         self.intrinsics = cameraIntrinsics
-        print(cameraIntrinsics)
+        print(f"Camera Intrinsics: {cameraIntrinsics}")
         if rgbHFOV is not None:
             self.rgbHFOV = np.deg2rad(rgbHFOV)
             self.tanHalfHFOV = math.tan(self.rgbHFOV / 2.0)

@@ -342,7 +342,7 @@ class OAK:
             # Try to calibrate the camera
             try:
                 self.calibData = device.readCalibration2()
-                print(self.calibData)
+                print(f"Calibration Data: {self.calibData}")
                 lensPosition = self.calibData.getLensPosition(dai.CameraBoardSocket.RGB)
                 if lensPosition:
                     self.camRgb.initialControl.setManualFocus(lensPosition)
