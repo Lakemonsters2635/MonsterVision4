@@ -424,7 +424,7 @@ class OAK:
         # re-initializes objects to zero/empty before each frame is read
         objects = []
         s_detections = sorted(detections, key=lambda det: det.label * 100000 + det.spatialCoordinates.z)
-        print(s_detections)
+        # print(s_detections)
 
         for detection in s_detections:
             roi = detection.boundingBoxMapping.roi
