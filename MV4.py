@@ -387,6 +387,8 @@ class OAK:
                 self.depthFrameColor = cv2.equalizeHist(self.depthFrameColor)
                 self.depthFrameColor = cv2.applyColorMap(self.depthFrameColor, cv2.COLORMAP_RAINBOW)
 
+                objects = []
+
                 detections = self.inDet.detections # Get the detections part as a JSON (I think)
                 if len(detections) != 0:
                     objects = processDetections(self, detections) # Returns JSON object of detected objects

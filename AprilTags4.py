@@ -1,5 +1,13 @@
 import random
-import apriltag
+import time
+
+usingRobotPyAprilTag = False
+try:
+    import apriltag
+except ImportError:
+    import robotpy_apriltag as apriltag
+    usingRobotPyAprilTag = True
+
 import cv2
 import math
 import numpy as np
@@ -172,8 +180,16 @@ class AprilTags:
     # def getTrapAngles()
         
     def __init__(self, tagFamilies, cameraIntrinsics=None, rgbHFOV = None): # Never use the cameraIntrinsics variable and it was throwing an error so I default it to None
-        options = apriltag.DetectorOptions(families="tag36h11")
-        self.detector = apriltag.Detector(options)
+
+        self.tagFamily = tagFamilies
+        self.lastFrameTime = time.time_ns() / 1.0e9
+
+        if usingRobotPyAprilTag:
+            self.detector = apriltag.AprilTagDetector()
+            self.detector.addFamily(tagFamilies)
+        else:
+            options = apriltag.DetectorOptions(families=tagFamilies)
+            self.detector = apriltag.Detector(options)
         
         # with 
 
@@ -193,10 +209,14 @@ class AprilTags:
 
     #@profile
     def detect(self, imageFrame, depthFrame, depthFrameColor, drawingFrame):
-        gray = cv2.cvtColor(imageFrame, cv2.COLOR_BGR2GRAY)
-        results = self.detector.detect(gray)
 
         objects = []
+        now = time.time_ns() / 1.0e9
+        fps = 1/(now - self.lastFrameTime)
+        self.lastFrameTime = now
+
+        gray = cv2.cvtColor(imageFrame, cv2.COLOR_BGR2GRAY)
+        results = self.detector.detect(gray)
 
         if drawingFrame is not None:
             dfw = drawingFrame.shape[1]
@@ -218,7 +238,7 @@ class AprilTags:
 
         # loop over the AprilTag detection results
         for r in results:
-            if r.hamming != 0:
+            if not usingRobotPyAprilTag and r.hamming != 0:
                 continue
 
 
@@ -235,13 +255,27 @@ class AprilTags:
 
             # extract the bounding box (x, y)-coordinates for the AprilTag
             # and convert each of the (x, y)-coordinate pairs to integers
-            (ptA, ptB, ptC, ptD) = r.corners
-            ptB = (int(ptB[0]), int(ptB[1]))
-            ptC = (int(ptC[0]), int(ptC[1]))
-            ptD = (int(ptD[0]), int(ptD[1]))
-            ptA = (int(ptA[0]), int(ptA[1]))
-            (cX, cY) = (int(r.center[0]), int(r.center[1]))
-            res = self.calc_spatials((ptA[0], ptA[1], ptC[0], ptC[1]), cX, cY, depthFrame)
+            if usingRobotPyAprilTag:
+                ptA = r.getCorner(0)
+                ptB = r.getCorner(1)
+                ptC = r.getCorner(2)
+                ptD = r.getCorner(3)
+                ptA = (int(ptA.x), int(ptA.y))
+                ptB = (int(ptB.x), int(ptB.y))
+                ptC = (int(ptC.x), int(ptC.y))
+                ptD = (int(ptD.x), int(ptD.y))
+                center = r.getCenter()
+                cX = int(center.x)
+                cY = int(center.y)
+                res = self.calc_spatials((ptA[0], ptA[1], ptC[0], ptC[1]), int(center.x), int(center.y), depthFrame)
+            else:
+                (ptA, ptB, ptC, ptD) = r.corners
+                ptB = (int(ptB[0]), int(ptB[1]))
+                ptC = (int(ptC[0]), int(ptC[1]))
+                ptD = (int(ptD[0]), int(ptD[1]))
+                ptA = (int(ptA[0]), int(ptA[1]))
+                (cX, cY) = (int(r.center[0]), int(r.center[1]))
+                res = self.calc_spatials((ptA[0], ptA[1], ptC[0], ptC[1]), cX, cY, depthFrame)
             if res == None:
                 continue
             (atX, atY, atZ, xAngle, yAngle) = res
@@ -259,9 +293,7 @@ class AprilTags:
             self.drawBoundingBox(imageFrame, ptA, ptB, ptC, ptD, (0, 255, 0), 2)
 
             
-
             # draw the center (x, y)-coordinates of the AprilTag
-            (cX, cY) = (int(r.center[0]), int(r.center[1]))
             cv2.circle(imageFrame, (cX, cY), 5, (0, 0, 255), -1)
 
             wd = abs(ptC[0] - ptA[0])
@@ -269,7 +301,8 @@ class AprilTags:
             lblX = int(cX - wd/2)
             lblY = int(cY - ht/2)
             # draw the tag family on the image
-            tagID= '{}: {}'.format(r.tag_family.decode("utf-8"), r.tag_id)
+            # tagID= '{}: {}'.format(r.tag_family.decode("utf-8"), r.tag_id)
+            tagID = self.tagFamily
             color = (0, 0, 255)
 
             if lblY < 75:
@@ -305,7 +338,8 @@ class AprilTags:
                 if lblY > drawingFrame.shape[0]:
                     lblY = drawingFrame.shape[0]
                 # draw the tag family on the image
-                tagID= '{}: {}'.format(r.tag_family.decode("utf-8"), r.tag_id)
+                # tagID= '{}: {}'.format(r.tag_family.decode("utf-8"), r.tag_id)  # Not supported in robotpy version
+                tagID = self.tagFamily
                 color = (0, 0, 255)
                 cv2.putText(drawingFrame, tagID, (lblX, lblY - 75), cv2.FONT_HERSHEY_TRIPLEX, 0.5, color)
                 cv2.putText(drawingFrame, f"X: {atX} {units}", (lblX, lblY - 60), cv2.FONT_HERSHEY_TRIPLEX, 0.5, color)
@@ -319,7 +353,13 @@ class AprilTags:
             if xAngle is None: xAngleDeg = 999
             if yAngle is None: yAngleDeg = 999
 
-            objects.append({"objectLabel": tagID, "x": atX, "y": atY, "z": atZ, "xa": xAngleDeg, "ya": yAngleDeg})
+            objects.append({"objectLabel": tagID, "x": atX, "y": atY, "z": atZ, "xa": xAngleDeg, "ya": yAngleDeg, "fps": fps})
+
+        fpsLocation = (10, imageFrame.shape[0]-15)
+        cv2.putText(imageFrame, f"fps: {fps}", fpsLocation, cv2.FONT_HERSHEY_TRIPLEX, 0.5, (0, 0, 0))
+
+        fpsLocation = (10, drawingFrame.shape[0]-15)
+        cv2.putText(drawingFrame, f"fps: {fps}", fpsLocation, cv2.FONT_HERSHEY_TRIPLEX, 0.5, (0, 0, 0))
 
         # cv2.imshow("dbg", imageFrame)
         return objects

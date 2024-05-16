@@ -2,8 +2,17 @@
 import json
 import sys
 import time
-from networktables import NetworkTables
-from networktables import NetworkTablesInstance
+
+usingNTCore = False
+try:
+# Older OSes use pynetworktables
+    from networktables import NetworkTables
+    from networktables import NetworkTablesInstance
+except ImportError:
+# New have ntcore preinstalled
+    import ntcore
+    usingNTCore = True
+
 import cv2
 import MultiThreadedDisplay4 as MTD
 import threading
@@ -15,9 +24,6 @@ try:
     from cscore import CameraServer
 except ImportError:
     cscoreAvailable = False
-
-# Tells you if you are on the robot or not by looking at the platform name (if you are using the WPILib pi image?)
-onRobot = platform.uname().node == "wpilibpi"
 
 # Set camera FPS
 CAMERA_FPS = 25
@@ -31,7 +37,12 @@ class FRC:
 
 
     def __init__(self, previewWidth, previewHeight):
-        # Team number
+        # Tells you if you are on the robot or not by looking at the platform name (if you are using the WPILib pi image?)
+        # onRobot really should be called "headless".  It means there's no graphics capability on the underlying hardware
+
+        self.onRobot = platform.uname().node == "wpilibpi"
+
+       # Team number
         self.team = 0 # 2635
         # If the pi is setup as a sever or a client
         self.server = False
@@ -57,7 +68,10 @@ class FRC:
 
         self.read_frc_config() # Read the FRC config file and initialize above variables
 
-        self.ntinst = NetworkTablesInstance.getDefault() # Create a NetworkTable Instance
+        if usingNTCore:
+            self.ntinst = ntcore.NetworkTableInstance.getDefault()
+        else:
+            self.ntinst = NetworkTablesInstance.getDefault() # Create a NetworkTable Instance
 
         # Sets up the NT depending on config
         if self.server:
@@ -68,9 +82,11 @@ class FRC:
             self.ntinst.startClientTeam(self.team)
             self.ntinst.startDSClient()
 
-        self.sd = NetworkTables.getTable("MonsterVision") # Get the MonsterVision NT; Maybe creates it
+        if usingNTCore:
+            self.sd = self.ntinst.getTable("MonsterVision")
+        else:
+            self.sd = NetworkTables.getTable("MonsterVision") # Get the MonsterVision NT; Maybe creates it
 
-    
 
     # Return True if we're running on Romi.  False if we're a coprocessor on a big 'bot
     # Never used but checks if the files exists
@@ -187,7 +203,8 @@ class FRC:
             self.detectionsImage = detectionFrame
         
         # Every DESIRED_FPS frame output to driver station/website view a merge of both image frames
-        if self.frame_counter % (CAMERA_FPS / DESIRED_FPS) == 0: # THIS IS THE MATH THAT ONLY GETS YOU HALF OF YOUR DESIRED FPS
+        # if self.frame_counter % (CAMERA_FPS / DESIRED_FPS) == 0: # THIS IS THE MATH THAT ONLY GETS YOU HALF OF YOUR DESIRED FPS
+        if True:
             # If you have both images then do a combine
             if self.aprilImage is not None and self.detectionsImage is not None:
                 img = cv2.hconcat([self.aprilImage, self.detectionsImage]) # Merges Frames together
@@ -199,7 +216,7 @@ class FRC:
                 img = self.detectionsImage
 
             # If you aren't on a robot then pop-up one window of what the driver station view should be
-            if not onRobot:
+            if not self.onRobot:
                 self.mtd.enqueueImage("DS View", img)
             self.mtd.enqueueImage("DS Image", img)              # Special window name causes MTD to send to camera server
             

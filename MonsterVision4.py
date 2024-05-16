@@ -85,33 +85,45 @@ OAK_D_MXID = None
 OAK_DP_MXID = None
 
 # devices = DAI4.DAI4.getDevices()
+deviceInfos = dai.Device.getAllAvailableDevices()
+usbSpeed = dai.UsbSpeed.SUPER
+openVinoVersion = dai.OpenVINO.Version.VERSION_2021_4
 
-# for c in devices:
-#     if c["cameras"] == 1:
-#         if OAK_DP_MXID is None:
-#             OAK_DP_MXID = c["mxid"]
-#         else:
-#             print(f"Found multiple OAK-1 devices.  Using {OAK_DP_MXID}")
-#     elif c["cameras"] == 3:
-#         if OAK_D_MXID is None:
-#             OAK_D_MXID = c["mxid"]
-#         else:
-#             print(f"Found multiple OAK-D devices.  Using {OAK_D_MXID}")
-#     else:
-#         print(f'Found device {c["mxid"]} having {c["cameras"]}.  This is unusual.')
-
-infos = dai.DeviceBootloader.getAllAvailableDevices()
-# OAK_D_MXID = "14442C105129C6D200"
-OAK_DP_MXID = '1944301001564D1300'       # OAK-D Pro
-# OAK_1_MXID = "14442C10E1474FD000"
+for deviceInfo in deviceInfos:
+    deviceInfo: dai.DeviceInfo
+    device: dai.Device = dai.Device(openVinoVersion, deviceInfo, usbSpeed)
+    print("===Connected to ", deviceInfo.getMxId())
+    mxId = device.getMxId()
+    cameras = device.getConnectedCameras()
+    usbSpeed = device.getUsbSpeed()
+    eepromData = device.readCalibration2().getEepromData()
+    print("   >>> MXID:", mxId)
+    print("   >>> Num of cameras:", len(cameras))
+    print("   >>> USB speed:", usbSpeed)
+    if eepromData.boardName != "":
+        print("   >>> Board name:", eepromData.boardName)
+    if eepromData.productName != "":
+        print("   >>> Product name:", eepromData.productName)
+    if len(cameras) == 1:
+        if OAK_DP_MXID is None:
+            OAK_DP_MXID = mxId
+        else:
+            print(f"Found multiple OAK-1 devices.  Using {OAK_DP_MXID}")
+    elif len(cameras) == 3:
+        if OAK_D_MXID is None:
+            OAK_D_MXID = mxId
+        else:
+            print(f"Found multiple OAK-D devices.  Using {OAK_D_MXID}")
+    else:
+        print(f'Found device {mxId} having {len(cameras)}.  This is unusual.')
 
 def checkCam(infos, mxid):
     for i in infos:
         if mxid == i.mxid: return i
     return None
 
-OAK_D_DEVINFO = checkCam(infos, OAK_D_MXID)
-OAK_DP_DEVINFO = checkCam(infos, OAK_DP_MXID)
+OAK_D_DEVINFO = checkCam(deviceInfos, OAK_D_MXID)
+OAK_DP_DEVINFO = checkCam(deviceInfos, OAK_DP_MXID)
 
 if OAK_D_DEVINFO is None and OAK_DP_DEVINFO is None:
     print("No cameras found")
